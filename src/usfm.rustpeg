@@ -1,0 +1,26 @@
+use std::str::FromStr;
+use super::{Chunk, Marker};
+
+#[pub]
+file -> Vec<Chunk<'input>>
+    = (text / mark)*
+
+text -> Chunk<'input>
+    = [^\\]+ { Chunk::Text(match_str) }
+
+mark -> Chunk<'input>
+    = marker:marker { Chunk::Mark(marker) }
+
+marker -> Marker
+    = v
+
+v -> Marker
+    = bs "v " num:num ws {
+        Marker::V { num: num }
+    }
+
+num -> u32 = [0-9]+ { u32::from_str(match_str).unwrap() }
+
+bs -> () = "\\"
+ws -> () = " " / "\t" / nl
+nl -> () = "\r\n" / "\r" / "\n"
